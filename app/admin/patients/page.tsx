@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Search, CheckCircle, XCircle, MoreVertical } from 'lucide-react';
 import { getAppointments, updateStatus, Appointment } from '@/utils/storage';
 
@@ -78,8 +79,10 @@ export default function PatientsPage() {
                                 {filteredAppointments.map((apt) => (
                                     <tr key={apt.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
                                         <td className="p-4">
-                                            <p className="font-bold text-slate-900 dark:text-white">{apt.name}</p>
-                                            <p className="text-xs text-slate-400">{apt.phone}</p>
+                                            <Link href={`/admin/patients/${apt.id}`} className="group block">
+                                                <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{apt.name}</p>
+                                                <p className="text-xs text-slate-400">{apt.phone}</p>
+                                            </Link>
                                         </td>
                                         <td className="p-4 text-slate-600 dark:text-slate-300">{apt.type}</td>
                                         <td className="p-4 text-slate-600 dark:text-slate-300">{apt.date}</td>

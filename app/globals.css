@@ -2,6 +2,25 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+@variant dark (&:where(.dark, .dark *));
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide Next.js dev tools if present */
+  nextjs-portal {
+    display: none;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
