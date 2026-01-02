@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: var(--color-teal-600);
+  --color-secondary: var(--color-blue-700);
+  --color-background: var(--color-slate-50);
+  --color-foreground: var(--color-slate-900);
+  --font-sans: var(--font-outfit);
+}
+
+/* Ensure accessible font size base */
+body {
+  font-size: 18px;
+}
