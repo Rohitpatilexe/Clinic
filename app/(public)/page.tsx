@@ -3,6 +3,7 @@ import DoctorProfile from "@/components/DoctorProfile";
 import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
 import LocationBlock from "@/components/LocationBlock";
+import FAQ from "@/components/FAQ";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Services />
       <DoctorProfile />
       <Testimonials />
+      <FAQ />
       <LocationBlock />
     </div>
   );

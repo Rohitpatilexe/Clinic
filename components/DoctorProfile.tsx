@@ -3,7 +3,7 @@ import { Award } from 'lucide-react';
 
 export default function DoctorProfile() {
     return (
-        <section className="py-16 lg:py-24 bg-white">
+        <section id="about" className="py-16 lg:py-24 bg-white">
             <div className="container mx-auto px-4">
                 <div className="max-w-5xl mx-auto bg-slate-50 rounded-3xl p-6 lg:p-12 shadow-xl shadow-slate-100 flex flex-col md:flex-row items-center gap-8 lg:gap-12">
 
@@ -11,8 +11,8 @@ export default function DoctorProfile() {
                     <div className="w-full md:w-1/3 flex-shrink-0">
                         <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
                             <Image
-                                src="/doctor-profile.png"
-                                alt="Dr. Rakesh Patil - Orthopedic Surgeon"
+                                src="https://placehold.co/400x400/e2e8f0/1e3a8a?text=Dr.+Rakesh+Patil"
+                                alt="Dr. Rakesh Patil - Expert Orthopedic Surgeon in Hubli"
                                 fill
                                 className="object-cover"
                             />

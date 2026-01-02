@@ -5,7 +5,7 @@ export default function MobileContactBar() {
         <div className="fixed bottom-0 left-0 right-0 z-50 flex lg:hidden h-16 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
             {/* Call Button */}
             <a
-                href="tel:+910000000000"
+                href="tel:+919876543210"
                 className="flex-1 bg-secondary text-white flex items-center justify-center gap-2 font-bold text-lg active:bg-blue-800 transition-colors"
                 aria-label="Call clinic"
             >
@@ -15,7 +15,7 @@ export default function MobileContactBar() {
 
             {/* WhatsApp Button */}
             <a
-                href="https://wa.me/910000000000"
+                href="https://wa.me/919876543210?text=Hi%20Dr%20Rakesh,%20I%20want%20to%20book%20an%20appointment"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-green-600 text-white flex items-center justify-center gap-2 font-bold text-lg active:bg-green-700 transition-colors"

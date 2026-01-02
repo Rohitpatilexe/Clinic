@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+html {
+  scroll-behavior: smooth;
+}
+
 @theme inline {
   --color-primary: var(--color-teal-600);
   --color-secondary: var(--color-blue-700);
   --color-background: var(--color-slate-50);
   --color-foreground: var(--color-slate-900);
   --font-sans: var(--font-outfit);
+}
+
+.dark {
+  --color-background: var(--color-slate-950);
+  --color-foreground: var(--color-slate-50);
 }
 
 /* Ensure accessible font size base */

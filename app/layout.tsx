@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import MobileContactBar from "@/components/MobileContactBar";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -11,8 +9,15 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Joint Care - Orthopedic Clinic in Hubli",
-  description: "Specialized joint care for elderly patients by Dr. Rakesh Patil.",
+  title: "Joint Care | Best Orthopedic Clinic in Hubli | Dr. Rakesh Patil",
+  description: "Expert Knee Replacement and Arthritis treatment in Hubli by Dr. Rakesh Patil (MBBS, MS Ortho). Book an appointment for joint pain relief today.",
+  keywords: ["Orthopedic doctor Hubli", "Knee Replacement Hubli", "Joint Care Clinic", "Dr Rakesh Patil", "Arthritis Specialist"],
+  openGraph: {
+    title: "Joint Care | Best Orthopedic Clinic in Hubli",
+    description: "Expert Knee Replacement and Arthritis treatment in Hubli by Dr. Rakesh Patil.",
+    type: "website",
+    locale: "en_IN",
+  }
 };
 
 export default function RootLayout({
@@ -21,16 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased pb-16 lg:pb-0`}
+        className={`${outfit.variable} font-sans bg-background text-foreground min-h-screen flex flex-col antialiased`}
       >
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-        </main>
-        <Footer />
-        <MobileContactBar />
+        </ThemeProvider>
       </body>
     </html>
   );

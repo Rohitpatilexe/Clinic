@@ -39,9 +39,10 @@ export default function LocationBlock() {
                                     <Phone className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-slate-900 block mb-1">Contact</h3>
-                                    <p className="text-slate-600 text-lg font-medium">+91 9620844663</p>
-                                </div>
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 block mb-1">Contact</h3>
+                                        <a href="tel:+919876543210" className="text-slate-600 text-lg font-medium hover:text-secondary">+91 9876543210</a>
+                                    </div>                </div>
                             </div>
                         </div>
                     </div>
