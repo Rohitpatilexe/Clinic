@@ -9,6 +9,7 @@ export interface Appointment {
     prescriptions?: string[];
     age?: number;
     gender?: string;
+    createdAt?: Date | string;
 }
 
 const MOCK_DATA: Appointment[] = [
@@ -74,6 +75,13 @@ export const updateAppointment = (id: number, updates: Partial<Appointment>) => 
         apt.id === id ? { ...apt, ...updates } : apt
     );
 
+    localStorage.setItem('appointments', JSON.stringify(updated));
+    window.dispatchEvent(new Event('appointment-updated'));
+};
+
+export const deleteAppointment = (id: number) => {
+    const appointments = getAppointments();
+    const updated = appointments.filter(a => a.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updated));
     window.dispatchEvent(new Event('appointment-updated'));
 };

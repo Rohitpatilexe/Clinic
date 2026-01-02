@@ -9,15 +9,14 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Joint Care | Best Orthopedic Clinic in Hubli | Dr. Rakesh Patil",
-  description: "Expert Knee Replacement and Arthritis treatment in Hubli by Dr. Rakesh Patil (MBBS, MS Ortho). Book an appointment for joint pain relief today.",
-  keywords: ["Orthopedic doctor Hubli", "Knee Replacement Hubli", "Joint Care Clinic", "Dr Rakesh Patil", "Arthritis Specialist"],
-  openGraph: {
-    title: "Joint Care | Best Orthopedic Clinic in Hubli",
-    description: "Expert Knee Replacement and Arthritis treatment in Hubli by Dr. Rakesh Patil.",
-    type: "website",
-    locale: "en_IN",
-  }
+  title: {
+    template: '%s | Joint Care Clinic',
+    default: 'Joint Care Clinic | Dr. Rakesh Patil',
+  },
+  description: 'Advanced Orthopedic Care & Joint Replacement Center in Hubli. Book appointments online.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

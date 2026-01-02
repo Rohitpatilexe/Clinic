@@ -1,139 +1,140 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, CheckCircle, XCircle, MoreVertical } from 'lucide-react';
-import { getAppointments, updateStatus, Appointment } from '@/utils/storage';
+import { useState, useEffect } from 'react';
+import {
+    Search,
+    Filter,
+    Phone,
+    Calendar,
+    ChevronRight,
+    UserX
+} from 'lucide-react';
+import { getAppointments, Appointment } from '@/utils/storage';
+import EmptyState from '@/components/EmptyState';
 
 export default function PatientsPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-
-    const loadData = () => {
-        const data = getAppointments();
-        setAppointments(data);
-        setIsLoading(false);
-    };
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
 
     useEffect(() => {
-        loadData();
-        const handleStorageChange = () => loadData();
-        window.addEventListener('appointment-updated', handleStorageChange);
-        return () => {
-            window.removeEventListener('appointment-updated', handleStorageChange);
-        };
+        setAppointments(getAppointments());
     }, []);
 
-    const handleAction = (action: 'Approve' | 'Reject', id: number) => {
-        const newStatus = action === 'Approve' ? 'Confirmed' : 'Cancelled';
-        updateStatus(id, newStatus);
-    };
+    const filteredAppointments = appointments.filter(appt => {
+        const matchesSearch = appt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            appt.phone.includes(searchQuery);
+        const matchesStatus = statusFilter === 'All' || appt.status === statusFilter;
 
-    const filteredAppointments = appointments.filter(apt =>
-        apt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        apt.phone.includes(searchTerm)
-    );
-
-    if (isLoading) {
-        return <div className="p-8 text-center text-slate-500">Loading patients...</div>;
-    }
+        return matchesSearch && matchesStatus;
+    });
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
+
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">All Patients</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Manage all appointment requests.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Patients</h1>
+                    <p className="text-slate-500 dark:text-slate-400">Manage patient records and appointments.</p>
                 </div>
+            </div>
 
-                {/* Search Bar */}
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            {/* Filters & Search */}
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400 dark:text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search by name or phone..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer"
+                    >
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
                 </div>
             </div>
 
             {/* Patients Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors">
-                {filteredAppointments.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-sm uppercase tracking-wide">
-                                    <th className="p-4 font-semibold">Patient Name</th>
-                                    <th className="p-4 font-semibold">Service</th>
-                                    <th className="p-4 font-semibold">Date & Time</th>
-                                    <th className="p-4 font-semibold">Status</th>
-                                    <th className="p-4 font-semibold text-right">Actions</th>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div className="overflow-x-auto">
+                    {filteredAppointments.length === 0 ? (
+                        <EmptyState
+                            title="No Patients Found"
+                            description={searchQuery ? "Try adjusting your search terms or filters." : "No patient records available."}
+                            icon={UserX}
+                            actionLabel={searchQuery ? "Clear Search" : undefined}
+                            onAction={searchQuery ? () => { setSearchQuery(''); setStatusFilter('All'); } : undefined}
+                        />
+                    ) : (
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-semibold">
+                                <tr>
+                                    <th className="px-6 py-4">Patient</th>
+                                    <th className="px-6 py-4">Contact</th>
+                                    <th className="px-6 py-4">Appt. Date</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
-                                {filteredAppointments.map((apt) => (
-                                    <tr key={apt.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
-                                        <td className="p-4">
-                                            <Link href={`/admin/patients/${apt.id}`} className="group block">
-                                                <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{apt.name}</p>
-                                                <p className="text-xs text-slate-400">{apt.phone}</p>
-                                            </Link>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                                {filteredAppointments.map((appt) => (
+                                    <tr key={appt.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <Link href={`/admin/patients/${appt.id}`} className="font-medium text-slate-900 dark:text-white hover:text-primary transition-colors block">
+                                                    {appt.name}
+                                                </Link>
+                                                <span className="text-xs text-slate-500">{appt.type}</span>
+                                            </div>
                                         </td>
-                                        <td className="p-4 text-slate-600 dark:text-slate-300">{apt.type}</td>
-                                        <td className="p-4 text-slate-600 dark:text-slate-300">{apt.date}</td>
-                                        <td className="p-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                        ${apt.status === 'Confirmed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : ''}
-                        ${apt.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : ''}
-                        ${apt.status === 'Completed' ? 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300' : ''}
-                        ${apt.status === 'Cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : ''}
-                      `}>
-                                                {apt.status}
+                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                                            <div className="flex items-center gap-2">
+                                                <Phone className="w-4 h-4 text-slate-400" />
+                                                {appt.phone}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                                            <div className="flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-slate-400" />
+                                                {appt.date}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                            ${appt.status === 'Confirmed' ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : ''}
+                            ${appt.status === 'Pending' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                            ${appt.status === 'Completed' ? 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600' : ''}
+                            ${appt.status === 'Cancelled' ? 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : ''}
+                        `}>
+                                                {appt.status}
                                             </span>
                                         </td>
-                                        <td className="p-4 text-right">
-                                            {apt.status === 'Pending' ? (
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button
-                                                        onClick={() => handleAction('Approve', apt.id)}
-                                                        className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                                                        title="Approve"
-                                                    >
-                                                        <CheckCircle className="w-5 h-5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleAction('Reject', apt.id)}
-                                                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                        title="Reject"
-                                                    >
-                                                        <XCircle className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-default">
-                                                    <MoreVertical className="w-5 h-5 opacity-0" />
-                                                </button>
-                                            )}
+                                        <td className="px-6 py-4 text-right">
+                                            <Link href={`/admin/patients/${appt.id}`} className="text-slate-400 hover:text-primary transition-colors">
+                                                <ChevronRight className="w-5 h-5 ml-auto" />
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                    </div>
-                ) : (
-                    <div className="p-12 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 mb-4">
-                            <Search className="w-8 h-8 text-slate-300" />
-                        </div>
-                        <h3 className="text-lg font-medium text-slate-900 dark:text-white">No patients found</h3>
-                        <p className="text-slate-500 dark:text-slate-400">Try adjusting your search criteria.</p>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
