@@ -7,7 +7,7 @@ export interface Appointment {
     status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
     notes?: string;
     prescriptions?: string[];
-    age?: number;
+    age?: string | number;
     gender?: string;
     createdAt?: Date | string;
 }
@@ -57,6 +57,13 @@ export const saveAppointment = (data: Omit<Appointment, 'id' | 'status'>) => {
 
     // Trigger event for cross-component updates
     window.dispatchEvent(new Event('appointment-updated'));
+
+    // Sync to DB
+    fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAppointment),
+    }).catch(err => console.error("Failed to sync to DB", err));
 };
 
 export const updateStatus = (id: number, status: Appointment['status']) => {
@@ -66,7 +73,15 @@ export const updateStatus = (id: number, status: Appointment['status']) => {
     );
 
     localStorage.setItem('appointments', JSON.stringify(updated));
+
     window.dispatchEvent(new Event('appointment-updated'));
+
+    // Sync to DB
+    fetch(`/api/appointments/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+    }).catch(err => console.error("Failed to sync status to DB", err));
 };
 
 export const updateAppointment = (id: number, updates: Partial<Appointment>) => {
@@ -76,12 +91,25 @@ export const updateAppointment = (id: number, updates: Partial<Appointment>) => 
     );
 
     localStorage.setItem('appointments', JSON.stringify(updated));
+
     window.dispatchEvent(new Event('appointment-updated'));
+
+    // Sync to DB
+    fetch(`/api/appointments/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+    }).catch(err => console.error("Failed to sync updates to DB", err));
 };
 
 export const deleteAppointment = (id: number) => {
     const appointments = getAppointments();
     const updated = appointments.filter(a => a.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updated));
+
     window.dispatchEvent(new Event('appointment-updated'));
+
+    fetch(`/api/appointments/${id}`, {
+        method: 'DELETE',
+    }).catch(err => console.error("Failed to sync delete to DB", err));
 };

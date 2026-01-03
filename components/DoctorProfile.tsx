@@ -9,10 +9,10 @@ export default function DoctorProfile() {
 
                     {/* Image Column */}
                     <div className="w-full md:w-1/3 flex-shrink-0">
-                        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+                        <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-lg lg:h-[500px]">
                             <Image
-                                src="https://placehold.co/400x400/e2e8f0/1e3a8a?text=Dr.+Rakesh+Patil"
-                                alt="Dr. Rakesh Patil - Expert Orthopedic Surgeon in Hubli"
+                                src="/images/doc.jpg"
+                                alt="Dr. Rakesh Patil"
                                 fill
                                 className="object-cover"
                             />

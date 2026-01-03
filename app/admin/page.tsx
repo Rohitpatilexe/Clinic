@@ -6,6 +6,7 @@ import {
     Calendar,
     Users,
     Clock,
+    Check,
     CheckCircle,
     ArrowRight,
     CalendarX,
@@ -139,16 +140,15 @@ export default function AdminDashboard() {
                                     <th className="px-6 py-4">Patient Name</th>
                                     <th className="px-6 py-4">Status</th>
                                     <th className="px-6 py-4">Date & Time</th>
-                                    <th className="px-6 py-4">Type</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                 {[...appointments].reverse().slice(0, 5).map((appt) => (
                                     <tr key={appt.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">{appt.name}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline - flex items - center px - 2.5 py - 0.5 rounded - full text - xs font - medium border
+                                        <td className="px-6 py-4 font-medium text-slate-900 dark:text-white align-middle">{appt.name}</td>
+                                        <td className="px-6 py-4 align-middle">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
                         ${appt.status === 'Confirmed' ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : ''}
                         ${appt.status === 'Pending' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
                         ${appt.status === 'Completed' ? 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600' : ''}
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
                                                 {appt.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300 align-middle">
                                             <span title={`Booked on: ${new Date(appt.createdAt || 0).toLocaleString()}`}>
                                                 {new Date(appt.date).toLocaleDateString('en-IN', {
                                                     day: 'numeric',
@@ -166,32 +166,33 @@ export default function AdminDashboard() {
                                                 })}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{appt.type}</td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-right align-middle">
                                             <div className="flex items-center justify-end gap-2">
                                                 {appt.status === 'Pending' && (
                                                     <button
                                                         onClick={() => handleStatusUpdate(appt.id, 'Confirmed')}
-                                                        className="text-green-600 hover:text-green-800 dark:hover:text-green-400 text-sm font-medium"
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                                        title="Accept Appointment"
                                                     >
-                                                        Accept
+                                                        <Check size={20} />
                                                     </button>
                                                 )}
                                                 {appt.status === 'Confirmed' && (
                                                     <button
                                                         onClick={() => handleStatusUpdate(appt.id, 'Completed')}
-                                                        className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400 text-sm font-medium"
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                                        title="Mark as Completed"
                                                     >
-                                                        Complete
+                                                        <CheckCircle size={20} />
                                                     </button>
                                                 )}
 
                                                 <button
                                                     onClick={() => handleDelete(appt.id)}
-                                                    className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                                    title="Delete"
+                                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                                    title="Cancel Appointment"
                                                 >
-                                                    <Trash2 className="w-4 h-4" />
+                                                    <Trash2 size={20} />
                                                 </button>
                                             </div>
                                         </td>

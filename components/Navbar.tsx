@@ -29,9 +29,9 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-2">
-              <a href="tel:+919876543210" className="hidden lg:flex items-center gap-2 text-secondary bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition-colors">
+              <a href="tel:+918133905968" className="hidden lg:flex items-center gap-2 text-secondary bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition-colors">
                 <Phone className="w-5 h-5" />
-                <span className="font-bold"> +91 9876543210</span>
+                <span className="font-bold"> +91 81339 05968</span>
               </a>
 
               <button

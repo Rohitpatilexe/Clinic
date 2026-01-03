@@ -16,7 +16,7 @@ export default function Hero() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                         {/* Primary CTA - WhatsApp */}
                         <a
-                            href="https://wa.me/919876543210?text=Hi%20Dr%20Rakesh,%20I%20want%20to%20book%20an%20appointment"
+                            href="https://wa.me/918133905968?text=Hi%20Dr%20Rakesh,%20I%20want%20to%20book%20an%20appointment"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all shadow-lg hover:shadow-green-200"
@@ -27,7 +27,7 @@ export default function Hero() {
 
                         {/* Secondary CTA - Call */}
                         <a
-                            href="tel:+919876543210"
+                            href="tel:+918133905968"
                             className="flex items-center justify-center gap-2 border-2 border-secondary text-secondary hover:bg-blue-50 px-8 py-4 rounded-xl text-lg font-bold transition-all"
                         >
                             <Phone className="w-6 h-6" />
@@ -37,10 +37,10 @@ export default function Hero() {
                 </div>
 
                 <div className="flex-1 w-full max-w-lg lg:max-w-xl">
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl shadow-blue-100 border-4 border-white">
+                    <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-xl lg:h-[500px]">
                         <Image
-                            src="https://placehold.co/800x600/e2e8f0/1e3a8a?text=Joint+Care+Center"
-                            alt="Dr. Rakesh Patil treating an elderly patient with care and expertise"
+                            src="/doctor.jpg"
+                            alt="Dr. Rakesh Patil treating a patient"
                             fill
                             className="object-cover"
                             priority

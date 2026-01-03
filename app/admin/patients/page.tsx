@@ -10,16 +10,45 @@ import {
     ChevronRight,
     UserX
 } from 'lucide-react';
-import { getAppointments, Appointment } from '@/utils/storage';
+import { getAppointments } from '@/utils/storage'; // Keeping for type reference if needed, but likely better to define locally or import type only
 import EmptyState from '@/components/EmptyState';
+// Actually, let's redefine the interface locally or import it if exported, to avoid confusion.
+// Checking previous file content, Appointment is imported from utils/storage.
+// Let's modify imports to remove getAppointments and keep Appointment type if possible, or define a Patient type.
+
+interface Patient {
+    id: string;
+    name: string;
+    phone: string;
+    date: string;
+    status: string;
+    type: string;
+}
 
 export default function PatientsPage() {
-    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [appointments, setAppointments] = useState<Patient[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setAppointments(getAppointments());
+        const fetchPatients = async () => {
+            try {
+                const response = await fetch('/api/patients');
+                if (response.ok) {
+                    const data = await response.json();
+                    setAppointments(data);
+                } else {
+                    console.error('Failed to fetch patients');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPatients();
     }, []);
 
     const filteredAppointments = appointments.filter(appt => {
@@ -72,7 +101,9 @@ export default function PatientsPage() {
             {/* Patients Table */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
-                    {filteredAppointments.length === 0 ? (
+                    {isLoading ? (
+                        <div className="p-8 text-center text-slate-500">Loading patients...</div>
+                    ) : filteredAppointments.length === 0 ? (
                         <EmptyState
                             title="No Patients Found"
                             description={searchQuery ? "Try adjusting your search terms or filters." : "No patient records available."}
@@ -86,7 +117,7 @@ export default function PatientsPage() {
                                 <tr>
                                     <th className="px-6 py-4">Patient</th>
                                     <th className="px-6 py-4">Contact</th>
-                                    <th className="px-6 py-4">Appt. Date</th>
+                                    <th className="px-6 py-4">Appointment Date</th>
                                     <th className="px-6 py-4">Status</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
@@ -111,7 +142,11 @@ export default function PatientsPage() {
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-slate-400" />
-                                                {appt.date}
+                                                {new Date(appt.date).toLocaleDateString('en-IN', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                })}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

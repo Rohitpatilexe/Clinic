@@ -10,31 +10,49 @@ export async function GET() {
         });
         return NextResponse.json(appointments);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch appointments' }, { status: 500 });
+        console.error("GET Error:", error);
+        return NextResponse.json({ error: 'Failed to fetch appointments', details: String(error) }, { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const { name, phone, date, type } = body;
+        // Clone request for logging to avoid stream consumption issues
+        // This is crucial for debugging "what did we actually receive?" without breaking the subsequent read
+        const bodyCheck = await request.clone().json();
+        console.log("POST Body:", bodyCheck);
 
+        const body = await request.json();
+        const { id, name, phone, date, type, status, prescriptions } = body;
+
+        // Validation
         if (!name || !phone || !date || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const appointmentDate = new Date(date);
+        if (isNaN(appointmentDate.getTime())) {
+            return NextResponse.json({ error: "Invalid Date" }, { status: 400 });
+        }
+
         const newAppointment = await db.appointment.create({
             data: {
+                // Keep ID logic to maintain sync with LocalStorage (which sends number-like strings)
+                id: id ? id.toString() : Date.now().toString(),
                 name,
                 phone,
-                date: new Date(date),
+                date: appointmentDate,
                 type,
-                status: 'Pending',
+                status: status || 'Pending',
+                // Keep prescriptions logic
+                prescriptions: prescriptions || [],
             },
         });
 
         return NextResponse.json(newAppointment);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 });
+        console.error("POST Error Details:", error);
+        // Return detailed error to help the user/frontend debug 500s
+        return NextResponse.json({ error: "Database Error", details: String(error) }, { status: 500 });
     }
 }

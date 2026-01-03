@@ -8,13 +8,16 @@ datasource db {
 }
 
 model Appointment {
-  id        String   @id @default(uuid())
+  id        String   @id
   name      String
   phone     String
+  age       String?
+  gender    String?
   date      DateTime
   type      String
   status    String   @default("Pending") // Pending, Confirmed, Completed, Cancelled
   notes     String?
+  prescriptions String[]
   createdAt DateTime @default(now())
 }
 

@@ -20,7 +20,7 @@ export default function LocationBlock() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900 block mb-1">Address</h3>
-                                    <p className="text-slate-600">Vidya Nagar, Hubli, Karnataka - 580031</p>
+                                    <p className="text-slate-600">JOINTCARE, NMR Scan Center, Gokul Rd, opposite New Bus Stand, Industrial Estate, Hubballi, Karnataka 580030</p>
                                 </div>
                             </div>
 
@@ -41,7 +41,7 @@ export default function LocationBlock() {
                                 <div>
                                     <div>
                                         <h3 className="font-bold text-slate-900 block mb-1">Contact</h3>
-                                        <a href="tel:+919876543210" className="text-slate-600 text-lg font-medium hover:text-secondary">+91 9876543210</a>
+                                        <a href="tel:+918133905968" className="text-slate-600 text-lg font-medium hover:text-secondary">+91 81339 05968</a>
                                     </div>                </div>
                             </div>
                         </div>
@@ -50,7 +50,7 @@ export default function LocationBlock() {
                     {/* Right Column: Map */}
                     <div className="flex-1 h-[400px] lg:h-auto min-h-[400px]">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15383.585579227572!2d75.1226068!3d15.3644023!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bb8d7356a6231bd%3A0x6734f5b214902181!2sVidya%20Nagar%2C%20Hubballi%2C%20Karnataka%20580031%2C%20India!5e0!3m2!1sen!2sus!4v1709664670000!5m2!1sen!2sus"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.608779667824!2d75.11708601247902!3d15.35118592813264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDIxJzA0LjMiTiA3NcKwMDcnMDEuNSJF!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin"
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}

@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect, use, useRef } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User, Phone, Calendar, Clock, Save, Plus, Trash2, CheckCircle, Printer } from 'lucide-react';
-import { getAppointmentById, updateAppointment, Appointment } from '@/utils/storage';
-import { useReactToPrint } from 'react-to-print';
-import PrescriptionPrintable from '@/components/PrescriptionPrintable';
+import { ArrowLeft, User, Phone, Calendar, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Appointment } from '@/utils/storage';
 import Link from 'next/link';
 
 interface PageProps {
@@ -14,69 +12,44 @@ interface PageProps {
 
 export default function PatientDetailPage({ params }: PageProps) {
     const resolvedParams = use(params);
-    const id = parseInt(resolvedParams.id);
+    const id = resolvedParams.id;
     const router = useRouter();
 
-    const [appointment, setAppointment] = useState<Appointment | null>(null);
-    const [notes, setNotes] = useState('');
-    const [prescriptions, setPrescriptions] = useState<string[]>([]);
-    const [newPrescription, setNewPrescription] = useState('');
+    const [patientData, setPatientData] = useState<{
+        profile: { name: string; phone: string; age: string; gender: string };
+        history: Appointment[];
+    } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-
-    // Print Ref
-    const printRef = useRef<HTMLDivElement>(null);
-
-    const handlePrint = useReactToPrint({
-        contentRef: printRef,
-        documentTitle: `Prescription-${id}`,
-    });
+    const [expandedId, setExpandedId] = useState<string | null>(null); // State for single expanded row
 
     useEffect(() => {
-        const data = getAppointmentById(id);
-        if (data) {
-            setAppointment(data);
-            setNotes(data.notes || '');
-            setPrescriptions(data.prescriptions || []);
-        }
-        setIsLoading(false);
+        const fetchPatientData = async () => {
+            try {
+                const response = await fetch(`/api/patients/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPatientData(data);
+                } else {
+                    console.error('Failed to fetch patient data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPatientData();
     }, [id]);
 
-    const handleSaveNotes = () => {
-        if (!appointment) return;
-        setIsSaving(true);
-
-        updateAppointment(appointment.id, {
-            notes,
-            prescriptions
-        });
-
-        setTimeout(() => {
-            setIsSaving(false);
-        }, 500);
+    const toggleExpand = (apptId: string) => {
+        setExpandedId(prev => prev === apptId ? null : apptId);
     };
 
-    const handleAddPrescription = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newPrescription.trim()) return;
-        setPrescriptions([...prescriptions, newPrescription.trim()]);
-        setNewPrescription('');
-    };
+    if (isLoading) return <div className="p-8 text-center text-slate-500">Loading patient profile...</div>;
+    if (!patientData) return <div className="p-8 text-center text-slate-500">Patient not found</div>;
 
-    const removePrescription = (index: number) => {
-        setPrescriptions(prescriptions.filter((_, i) => i !== index));
-    };
-
-    const handleComplete = () => {
-        if (!appointment) return;
-        if (confirm('Are you sure you want to mark this appointment as Completed?')) {
-            updateAppointment(appointment.id, { status: 'Completed' });
-            router.push('/admin/patients');
-        }
-    };
-
-    if (isLoading) return <div className="p-8 text-center text-slate-500">Loading patient...</div>;
-    if (!appointment) return <div className="p-8 text-center text-slate-500">Patient not found</div>;
+    const { profile, history } = patientData;
 
     return (
         <div className="space-y-6 max-w-6xl mx-auto">
@@ -86,172 +59,142 @@ export default function PatientDetailPage({ params }: PageProps) {
                 Back to Patients
             </Link>
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{appointment.name}</h1>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize border
-                ${appointment.status === 'Confirmed' ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : ''}
-                ${appointment.status === 'Pending' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
-                ${appointment.status === 'Completed' ? 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600' : ''}
-                ${appointment.status === 'Cancelled' ? 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : ''}
-            `}>
-                            {appointment.status}
-                        </span>
+            {/* Header / Profile Card */}
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="h-20 w-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-primary dark:text-blue-400">
+                            <User className="w-10 h-10" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{profile.name}</h1>
+                            <div className="flex items-center gap-4 text-slate-600 dark:text-slate-300">
+                                <span className="flex items-center gap-1.5">
+                                    <Phone className="w-4 h-4 text-slate-400" />
+                                    {profile.phone}
+                                </span>
+                                <span className="text-slate-300">|</span>
+                                <span>{profile.age} • {profile.gender}</span>
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-slate-500 dark:text-slate-400 text-lg">{appointment.type} Consultation</p>
-                </div>
 
-                <div className="flex items-center gap-3">
-                    {/* Print Button */}
                     <button
-                        onClick={() => handlePrint()}
-                        className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-slate-900/10 transition-all active:scale-[0.98] dark:bg-slate-700 dark:hover:bg-slate-600"
+                        className="flex items-center gap-2 bg-primary hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-teal-900/10 transition-all active:scale-[0.98]"
+                        onClick={() => alert('Follow-up booking logic here')}
                     >
-                        <Printer className="w-5 h-5" />
-                        Print Rx
+                        <Plus className="w-5 h-5" />
+                        Book Follow-up
                     </button>
-
-                    {appointment.status !== 'Completed' && (
-                        <button
-                            onClick={handleComplete}
-                            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-green-900/10 transition-all active:scale-[0.98]"
-                        >
-                            <CheckCircle className="w-5 h-5" />
-                            Mark as Completed
-                        </button>
-                    )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Appointment History */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white px-1">Appointment History</h2>
 
-                {/* Left Column: Patient Info */}
-                <div className="space-y-6">
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                            <User className="w-5 h-5 text-primary" />
-                            Patient Details
-                        </h2>
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-semibold">
+                                <tr>
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4">Type</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                                {history.map((appt) => {
+                                    // Normally ID would be number from types, but route returns string ID from DB. 
+                                    // Types might be mismatch in Utils vs DB, converting to string safe.
+                                    const apptId = String(appt.id);
+                                    const isExpanded = expandedId === apptId;
 
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                <div className="bg-slate-50 dark:bg-slate-900 p-2 rounded-lg"><Phone className="w-4 h-4" /></div>
-                                <div>
-                                    <p className="text-xs text-slate-400 uppercase font-semibold">Phone</p>
-                                    <p>{appointment.phone}</p>
-                                </div>
-                            </div>
+                                    return (
+                                        <React.Fragment key={apptId}>
+                                            <tr
+                                                onClick={() => toggleExpand(apptId)}
+                                                className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group"
+                                            >
+                                                <td className="px-6 py-4 text-slate-900 dark:text-white font-medium">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="w-4 h-4 text-slate-400" />
+                                                        {new Date(appt.date).toLocaleDateString()}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                                                    {appt.type}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                                                        ${appt.status === 'Confirmed' ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : ''}
+                                                        ${appt.status === 'Pending' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : ''}
+                                                        ${appt.status === 'Completed' ? 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600' : ''}
+                                                        ${appt.status === 'Cancelled' ? 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : ''}
+                                                    `}>
+                                                        {appt.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button className="text-slate-400 hover:text-primary transition-colors">
+                                                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {isExpanded && (
+                                                <tr className="bg-slate-50 dark:bg-slate-900/30">
+                                                    <td colSpan={4} className="px-6 py-4">
+                                                        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                                                            <div className="flex justify-between items-start mb-6">
+                                                                <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Doctor's Notes / Prescription</h3>
+                                                                <Link
+                                                                    href={`/admin/appointments/${appt.id}`}
+                                                                    className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition-colors font-medium flex items-center gap-1"
+                                                                >
+                                                                    Edit Record
+                                                                </Link>
+                                                            </div>
 
-                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                <div className="bg-slate-50 dark:bg-slate-900 p-2 rounded-lg"><Calendar className="w-4 h-4" /></div>
-                                <div>
-                                    <p className="text-xs text-slate-400 uppercase font-semibold">Age / Gender</p>
-                                    <p>{appointment.age ? `${appointment.age} yrs` : 'N/A'} • {appointment.gender || 'N/A'}</p>
-                                </div>
-                            </div>
+                                                            <div className="space-y-6">
+                                                                {appt.notes && (
+                                                                    <div>
+                                                                        <p className="text-xs font-semibold text-slate-400 uppercase mb-2">Notes</p>
+                                                                        <pre className="whitespace-pre-wrap font-sans text-slate-700 dark:text-slate-300 text-sm bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 leading-relaxed">
+                                                                            {appt.notes}
+                                                                        </pre>
+                                                                    </div>
+                                                                )}
 
-                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                <div className="bg-slate-50 dark:bg-slate-900 p-2 rounded-lg"><Clock className="w-4 h-4" /></div>
-                                <div>
-                                    <p className="text-xs text-slate-400 uppercase font-semibold">Appointment Time</p>
-                                    <p>{appointment.date}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                                                {appt.prescriptions && appt.prescriptions.length > 0 && (
+                                                                    <div>
+                                                                        <p className="text-xs font-semibold text-slate-400 uppercase mb-2">Prescription</p>
+                                                                        <ul className="list-decimal list-inside text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+                                                                            {appt.prescriptions.map((p, i) => (
+                                                                                <li key={i} className="pl-2">{p}</li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+                                                                )}
 
-                {/* Right Column: Doctor's Console */}
-                <div className="lg:col-span-2 space-y-6">
-
-                    {/* Medical Notes */}
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Medical Notes</h2>
-                            <button
-                                onClick={handleSaveNotes}
-                                disabled={isSaving}
-                                className="text-primary hover:text-teal-700 dark:hover:text-teal-400 font-medium text-sm flex items-center gap-1 disabled:opacity-50"
-                            >
-                                <Save className="w-4 h-4" />
-                                {isSaving ? 'Saving...' : 'Save Notes'}
-                            </button>
-                        </div>
-                        <textarea
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Enter clinical observations, diagnosis, and treatment plan..."
-                            className="w-full h-48 p-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
-                        />
-                    </div>
-
-                    {/* Prescriptions */}
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Prescription</h2>
-
-                        <form onSubmit={handleAddPrescription} className="flex gap-2 mb-4">
-                            <input
-                                type="text"
-                                value={newPrescription}
-                                onChange={(e) => setNewPrescription(e.target.value)}
-                                placeholder="e.g. Paracetamol 500mg (1-0-1) x 3 days"
-                                className="flex-1 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-primary hover:bg-teal-700 text-white p-2 rounded-xl transition-colors"
-                            >
-                                <Plus className="w-5 h-5" />
-                            </button>
-                        </form>
-
-                        <div className="space-y-2">
-                            {prescriptions.length === 0 && (
-                                <p className="text-slate-400 italic text-sm">No medications added yet.</p>
-                            )}
-                            {prescriptions.map((script, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg group">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium">
-                                        {idx + 1}. {script}
-                                    </span>
-                                    <button
-                                        onClick={() => removePrescription(idx)}
-                                        className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-
-                        {prescriptions.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
-                                <button
-                                    onClick={handleSaveNotes}
-                                    disabled={isSaving}
-                                    className="text-primary hover:text-teal-700 dark:hover:text-teal-400 font-medium text-sm flex items-center gap-1 disabled:opacity-50"
-                                >
-                                    <Save className="w-4 h-4" />
-                                    {isSaving ? 'Saving...' : 'Save Prescriptions'}
-                                </button>
-                            </div>
-                        )}
+                                                                {!appt.notes && (!appt.prescriptions || appt.prescriptions.length === 0) && (
+                                                                    <p className="text-sm text-slate-400 italic">No notes or prescriptions recorded for this visit.</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
-            {/* Hidden Printable Area */}
-            <div className="hidden print:block">
-                <PrescriptionPrintable
-                    ref={printRef}
-                    patient={appointment}
-                    prescriptions={prescriptions}
-                    notes={notes}
-                />
-            </div>
-
         </div>
     );
 }
+
+import React from 'react';
