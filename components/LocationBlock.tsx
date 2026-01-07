@@ -20,7 +20,15 @@ export default function LocationBlock() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900 block mb-1">Address</h3>
-                                    <p className="text-slate-600">JOINTCARE, NMR Scan Center, Gokul Rd, opposite New Bus Stand, Industrial Estate, Hubballi, Karnataka 580030</p>
+                                    <p className="text-slate-600 mb-2">JOINTCARE, NMR Scan Center, Gokul Rd, opposite New Bus Stand, Industrial Estate, Hubballi, Karnataka 580030</p>
+                                    <a
+                                        href="https://www.google.com/maps/dir/?api=1&destination=15.409076113015827,75.10988118497654"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-secondary font-medium hover:text-blue-700 underline decoration-2 underline-offset-2 inline-flex items-center gap-1"
+                                    >
+                                        Get Directions
+                                    </a>
                                 </div>
                             </div>
 
@@ -30,7 +38,7 @@ export default function LocationBlock() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900 block mb-1">Clinic Timings</h3>
-                                    <p className="text-slate-600">Mon - Sat: 5:00PM - 8:00 PM</p>
+                                    <p className="text-slate-600">Mon - Sat: 1:00 PM - 3:00 PM & 5:00 PM - 8:00 PM</p>
                                 </div>
                             </div>
 
@@ -50,7 +58,7 @@ export default function LocationBlock() {
                     {/* Right Column: Map */}
                     <div className="flex-1 h-[400px] lg:h-auto min-h-[400px]">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.608779667824!2d75.11708601247902!3d15.35118592813264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDIxJzA0LjMiTiA3NcKwMDcnMDEuNSJF!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.6!2d75.10988118497654!3d15.409076113015827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDI0JzMyLjciTiA3NcKwMDYnMzUuNiJF!5e0!3m2!1sen!2sin!4v1600000000000!5m2!1sen!2sin"
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}

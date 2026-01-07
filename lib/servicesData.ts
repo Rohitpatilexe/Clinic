@@ -73,5 +73,21 @@ export const services: Service[] = [
             'Geriatric Fracture Care'
         ],
         icon: Stethoscope
+    },
+    {
+        slug: 'total-hip-replacement',
+        title: 'Total Hip Replacement',
+        shortDesc: 'Advanced surgical procedure to replace damaged hip joints, restoring mobility and eliminating pain.',
+        fullDesc: `
+      <p>Total Hip Replacement is a surgical procedure in which the hip joint is replaced by a prosthetic implant. Hip replacement surgery can be performed as a total replacement or a hemi (half) replacement. It is generally conducted to relieve arthritis pain or in some hip fractures.</p>
+      <p>We utilize advanced techniques to ensure precise implant positioning, which restores the natural biomechanics of the hip joint. This results in significant pain relief, improved mobility, and a better quality of life for our patients.</p>
+    `,
+        benefits: [
+            'Minimally Invasive Approaches',
+            'Durable Implant Options',
+            'Rapid Recovery Protocols',
+            'Comprehensive Rehabilitation'
+        ],
+        icon: Bone
     }
 ];

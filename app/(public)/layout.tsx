@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import MobileContactBar from "@/components/MobileContactBar";
 
 export default function PublicLayout({
     children,
@@ -14,7 +13,6 @@ export default function PublicLayout({
                 {children}
             </main>
             <Footer />
-            <MobileContactBar />
         </div>
     );
 }

@@ -98,26 +98,42 @@ export default function AppointmentDetailPage({ params }: PageProps) {
         }, 500);
     };
 
-    const handleSendWhatsApp = async () => {
+    const handleWhatsAppShare = () => {
         if (!appointment) return;
-        setIsSending(true);
-        try {
-            const res = await fetch('/api/send-prescription', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ appointmentId: appointment.id }),
-            });
-            if (res.ok) {
-                alert('Prescription link sent to WhatsApp!');
-            } else {
-                const data = await res.json();
-                alert(`Failed: ${data.error || 'Unknown error'}`);
-            }
-        } catch (e) {
-            alert('Failed to send request.');
-        } finally {
-            setIsSending(false);
+
+        // 1. Clean Phone Number (Remove spaces, dashes)
+        let phone = appointment.phone.replace(/\D/g, '');
+        // Default to India (+91) if no country code provided
+        if (phone.length === 10) {
+            phone = '91' + phone;
         }
+
+        // 2. Format Date
+        const dateStr = new Date(appointment.date).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        // 3. Build Message
+        const prescriptionText = prescriptions.length > 0
+            ? prescriptions.map(p => `- ${p}`).join('\n')
+            : "General Consultation - No specific meds added.";
+
+        const text = `*Joint Care Clinic Appointment Summary*
+--------------------------------
+👤 *Patient:* ${appointment.name}
+📅 *Date:* ${dateStr}
+--------------------------------
+💊 *Prescription / Notes:*
+${prescriptionText}
+--------------------------------
+👨‍⚕️ *Dr. Rakesh Patil*
+📍 *Location:* https://maps.app.goo.gl/YourMapLinkHere`;
+
+        // 4. Open WhatsApp
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
     };
 
     const handleAddPrescription = (e: React.FormEvent) => {
@@ -197,12 +213,11 @@ export default function AppointmentDetailPage({ params }: PageProps) {
 
                     {/* WhatsApp Button */}
                     <button
-                        onClick={handleSendWhatsApp}
-                        disabled={isSending}
-                        className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-teal-900/10 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                        onClick={handleWhatsAppShare}
+                        className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-teal-900/10 transition-all active:scale-[0.98]"
                     >
                         <Send className="w-5 h-5" />
-                        {isSending ? 'Sending...' : 'Send to WA'}
+                        Send to WA
                     </button>
 
                     {appointment.status !== 'Completed' && (

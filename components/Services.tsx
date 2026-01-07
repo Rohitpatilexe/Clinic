@@ -12,12 +12,12 @@ export default function Services() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {services.map((service, index) => (
                         <Link
                             href={`/services/${service.slug}`}
                             key={index}
-                            className="group bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-xl hover:border-blue-100 transition-all duration-300"
+                            className="group bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-lg hover:border-emerald-100 transition-all duration-300 hover:-translate-y-1"
                         >
                             <div className="bg-blue-50 text-secondary p-4 rounded-full mb-4 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                                 <service.icon className="w-8 h-8" />
